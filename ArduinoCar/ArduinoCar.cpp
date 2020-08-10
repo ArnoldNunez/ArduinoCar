@@ -21,6 +21,7 @@ int main()
     mat(1, 1, 3.2);
     double newVal = mat(1, 1);
 
+
     mat.Show();
 }
 
