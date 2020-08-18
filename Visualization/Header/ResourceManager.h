@@ -1,12 +1,13 @@
 #ifndef RESOURCE_MANAGER_H
 #define RESOURCE_MANAGER_H
 
-#include <map>
-#include <string>
+#include "Shader.h"
+#include "Texture2D.h"
 
 #include <glad\glad.h>
 
-#include "Shader.h"
+#include <map>
+#include <string>
 
 namespace ArduinoCar_Visualization
 {
@@ -14,6 +15,7 @@ namespace ArduinoCar_Visualization
 	{
 	public:
 		std::map<std::string, Shader> Shaders;
+		std::map<std::string, Texture2D> Textures;
 
 		ResourceManager();
 		~ResourceManager();
@@ -30,6 +32,16 @@ namespace ArduinoCar_Visualization
 		Shader GetShader(std::string name);
 
 		/**
+		 * Loads (and generates) a texture from file
+		 */
+		Texture2D LoadTexture(const char* file, bool alpha, std::string name);
+
+		/**
+		 * Retreives a stored texture
+		 */
+		Texture2D GetTexture(std::string name);
+
+		/**
 		 * Properly deallocates all loaded resources
 		 */
 		void Clear();
@@ -41,6 +53,10 @@ namespace ArduinoCar_Visualization
 		
 		Shader loadShaderFromFile(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile = nullptr);
 
+		/**
+		 * Loads a single texture from file
+		 */
+		Texture2D loadTextureFromFile(const char* file, bool alpha);
 	};
 }
 

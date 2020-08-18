@@ -147,13 +147,21 @@
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
-    <ClCompile Include="Source\Sprite.cpp" />
+    <ClCompile Include="Source\SpriteRenderer.cpp" />
+    <ClCompile Include="Source\stb_image.c" />
+    <ClCompile Include="Source\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header\Engine.h" />
     <ClInclude Include="Header\ResourceManager.h" />
     <ClInclude Include="Header\Shader.h" />
-    <ClInclude Include="Header\Sprite.h" />
+    <ClInclude Include="Header\SpriteRenderer.h" />
+    <ClInclude Include="Header\stb_image.h" />
+    <ClInclude Include="Header\Texture2D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\fragment_shader.frag" />
+    <None Include="Shaders\vertex_shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

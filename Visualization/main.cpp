@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     }
     
     ResourceManager resourceManager;
-    Engine engine(SCREEN_WIDTH, SCREEN_HEIGHT);
+    Engine engine(SCREEN_WIDTH, SCREEN_HEIGHT, resourceManager);
 
     engine.Init();
 

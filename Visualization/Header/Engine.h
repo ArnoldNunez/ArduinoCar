@@ -4,12 +4,15 @@
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
 
+#include "ResourceManager.h"
+#include "SpriteRenderer.h"
+
 namespace ArduinoCar_Visualization
 {
 	class Engine
 	{
 	public:
-		Engine(unsigned int width, unsigned int height);
+		Engine(unsigned int width, unsigned int height, ResourceManager& resourceManager);
 		~Engine();
 		Engine(const Engine&) = delete;
 
@@ -20,6 +23,9 @@ namespace ArduinoCar_Visualization
 	private:
 		unsigned int mWidth;
 		unsigned int mHeight;
+
+		ResourceManager& mResourceManager;
+		SpriteRenderer* mRenderer;
 	};
 }
 
