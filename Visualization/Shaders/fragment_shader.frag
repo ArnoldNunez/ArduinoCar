@@ -2,7 +2,7 @@
 in vec2 TexCoords;
 out vec4 color;
 
-uniform sampler3D image;
+uniform sampler2D image;
 uniform vec3 spriteColor;
 
 void main()
