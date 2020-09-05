@@ -31,7 +31,7 @@ void Engine::Init()
 	this->mRenderer = new SpriteRenderer(shader);
 
 	// Load textures
-	this->mResourceManager.LoadTexture("../Textures/awsomeface.png", true, "face");
+	this->mResourceManager.LoadTexture("Textures/awesomeface.png", true, "face");
 
 }
 
