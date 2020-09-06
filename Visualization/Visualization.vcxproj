@@ -147,17 +147,21 @@
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\SimulationObject.cpp" />
     <ClCompile Include="Source\SpriteRenderer.cpp" />
     <ClCompile Include="Source\stb_image.c" />
     <ClCompile Include="Source\Texture2D.cpp" />
+    <ClCompile Include="Source\Turtle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header\Engine.h" />
     <ClInclude Include="Header\ResourceManager.h" />
     <ClInclude Include="Header\Shader.h" />
+    <ClInclude Include="Header\SimulationObject.h" />
     <ClInclude Include="Header\SpriteRenderer.h" />
     <ClInclude Include="Header\stb_image.h" />
     <ClInclude Include="Header\Texture2D.h" />
+    <ClInclude Include="Header\Turtle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fragment_shader.frag" />
