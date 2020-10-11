@@ -41,7 +41,7 @@ namespace ArduinoCar_Visualization
 		/**
 		 * Destructor
 		 */
-		~SimulationObject();
+		virtual ~SimulationObject();
 
 		/**
 		 * Draws the sprite associated with this object using the specified renderer.

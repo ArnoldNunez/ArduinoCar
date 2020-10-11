@@ -32,7 +32,11 @@ void Engine::Init()
 
 	// Load textures
 	this->mResourceManager.LoadTexture("Textures/awesomeface.png", true, "face");
-
+	this->mResourceManager.LoadTexture("Textures/gem.png", true, "gem");
+	this->mResourceManager.LoadTexture("Textures/gem_empty.png", true, "gem_empty");
+	this->mResourceManager.LoadTexture("Textures/red_dot.png", true, "red_dot");
+	this->mResourceManager.LoadTexture("Textures/red_dot_dark.png", true, "red_dot_dark");
+	this->mResourceManager.LoadTexture("Textures/turtle.png", true, "turtle");
 }
 
 void Engine::Update(float dt)

@@ -6,6 +6,8 @@
 
 namespace MathHelpers
 {
+	constexpr double M_PI = 3.1415926535897931;
+
 	/**
 	 * Computes the distance between two points
 	 */

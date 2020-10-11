@@ -148,20 +148,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ArduinoCar.cpp" />
+    <ClCompile Include="Source\Gem.cpp" />
     <ClCompile Include="Source\GemMeasurement.cpp" />
     <ClCompile Include="Source\MathHelpers.cpp" />
     <ClCompile Include="Source\Matrix.cpp" />
     <ClCompile Include="Source\Point2D.cpp" />
     <ClCompile Include="Source\Robot.cpp" />
     <ClCompile Include="Source\SLAM.cpp" />
+    <ClCompile Include="Source\State.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Header\Gem.h" />
     <ClInclude Include="Header\GemMeasurement.h" />
     <ClInclude Include="Header\MathHelpers.h" />
     <ClInclude Include="Header\Matrix.h" />
     <ClInclude Include="Header\Point2D.h" />
     <ClInclude Include="Header\Robot.h" />
     <ClInclude Include="Header\SLAM.h" />
+    <ClInclude Include="Header\State.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

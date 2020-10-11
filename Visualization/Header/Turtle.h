@@ -9,16 +9,21 @@ namespace ArduinoCar_Visualization
 	class Turtle : SimulationObject
 	{
 	public:
+		/**
+		 * Constructor
+		 */
 		Turtle();
-		~Turtle();
+
+		/**
+		 * Destructor
+		 */
+		virtual ~Turtle();
 
 
 		/**
 		 * Draws the turtle using the specified renderer.
 		 */
 		virtual void Draw(SpriteRenderer& renderer);
-	private:
-
 	};
 
 

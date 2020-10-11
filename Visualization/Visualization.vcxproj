@@ -147,6 +147,7 @@
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\Simulation.cpp" />
     <ClCompile Include="Source\SimulationObject.cpp" />
     <ClCompile Include="Source\SpriteRenderer.cpp" />
     <ClCompile Include="Source\stb_image.c" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Header\Engine.h" />
     <ClInclude Include="Header\ResourceManager.h" />
     <ClInclude Include="Header\Shader.h" />
+    <ClInclude Include="Header\Simulation.h" />
     <ClInclude Include="Header\SimulationObject.h" />
     <ClInclude Include="Header\SpriteRenderer.h" />
     <ClInclude Include="Header\stb_image.h" />
