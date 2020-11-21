@@ -8,6 +8,7 @@
 #include "GemMeasurement.h"
 
 #include <vector>
+#include <list>
 #include <map>
 
 namespace ArduinoCar_Core
@@ -18,17 +19,20 @@ namespace ArduinoCar_Core
 	class State
 	{
 	public:
+		const double EXTRACTION_DISTANCE = 0.25;
+
+
 		/**
 		 * Constructor
 		 */
 		State(const std::vector<std::vector<char>> &map,
-			const std::vector<std::vector<char>> &gemChecklist);
+			const std::list<char> &gemChecklist);
 
 		/**
 		 * Constructor
 		 */
 		State(const std::vector<std::vector<char>>& map,
-			const std::vector<std::vector<char>>& gemChecklist,
+			const std::list<char>& gemChecklist,
 			double maxDistance,
 			double maxSteering);
 
@@ -36,7 +40,7 @@ namespace ArduinoCar_Core
 		 * Constructor
 		 */
 		State(const std::vector<std::vector<char>>& map,
-			const std::vector<std::vector<char>>& gemChecklist,
+			const std::list<char>& gemChecklist,
 			double maxDistance,
 			double maxSteering,
 			double robotDistNoise,
@@ -54,17 +58,34 @@ namespace ArduinoCar_Core
 		 */
 		void GenerateMeasurements(bool noiseFlag, std::map<int, GemMeasurement>& out);
 
+		/**
+		 * Updates the state acording to the given action
+		 */
+		void UpdateAccordingTo(const std::vector<std::string>& action, bool noiseFlag);
+
+
 	private:
-		std::vector<std::vector<char>> mOriginalGemChecklist;
-		std::vector<std::vector<char>> mGemChecklist;
-		std::vector<std::vector<char>> mCollectedGems;
-		std::vector<Gem> mGemLocsOnMap;	// TODO
-		std::vector<ArduinoCar_Core::Point2D> mReportedGemLocations;
+		std::list<char> mOriginalGemChecklist;			// List of gem types to be picked up
+		std::list<char> mGemChecklist;					// Copy of original gem checklist
+		std::list<Gem> mCollectedGems;					// List of collected gems
+		std::list<Gem> mGemLocsOnMap;					// List of gems and their x,y locations on map
+		std::map<char, Point2D> mReportedGemLocations;	// Map between gem type and its reported pickup location
 
 		double mMaxDistance;
 		double mMaxSteering;
-		ArduinoCar_Core::Point2D mStartPosition;
+		Point2D mStartPosition;
 		Robot mRobot;
+
+
+		/**
+		 * Attempts to perform a move action if that action is valid
+		 */
+		void _attemptMove(double steering, double distance, bool noiseFlag);
+
+		/**
+		 * Attempt to extract a gem from the current x,y location.
+		 */
+		void _attemptExtraction(char gemType, double currentX, double currentY);
 	};
 }
 

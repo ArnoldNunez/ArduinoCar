@@ -118,6 +118,5 @@ ArduinoCar_Core::Point2D ArduinoCar_Core::Robot::FindNextPoint(double steering, 
 
 std::ostream& ArduinoCar_Core::operator<<(std::ostream& strm, const Robot& r)
 {
-	// TODO: insert return statement here
 	return strm << "Robot --- X: " << r.mX << " Y: " << r.mY << endl;
 }

@@ -39,6 +39,10 @@ namespace ArduinoCar_Core
 		 */
 		int GetID() const { return this->mID; }
 
+
+		bool operator == (const Gem& other) const { return other.GetID() == this->GetID(); }
+		bool operator != (const Gem& other) const { return !operator==(other); }
+
 	private:
 		int mID;
 	};

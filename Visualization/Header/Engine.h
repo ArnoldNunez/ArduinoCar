@@ -6,12 +6,18 @@
 
 #include "ResourceManager.h"
 #include "SpriteRenderer.h"
+#include "Simulation.h"
+
+#include <vector>
 
 namespace ArduinoCar_Visualization
 {
 	class Engine
 	{
 	public:
+		std::vector<Simulation> Tests;
+		unsigned int Test;
+
 		Engine(unsigned int width, unsigned int height, ResourceManager& resourceManager);
 		~Engine();
 		Engine(const Engine&) = delete;

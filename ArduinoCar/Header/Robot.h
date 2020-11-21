@@ -70,6 +70,10 @@ namespace ArduinoCar_Core
 		 */
 		Point2D FindNextPoint(double steering, double distance);
 
+
+		double GetX() const { return this->mX; }
+		double GetY() const { return this->mY; }
+
 	private:
 		double mX;
 		double mY;
