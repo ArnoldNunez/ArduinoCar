@@ -118,6 +118,19 @@ State::State(const std::vector<std::vector<char>>& map, const std::list<char>& g
 		robotDistNoise, robotBearingNoise);
 }
 
+State::State(const State& state)
+{
+	this->mOriginalGemChecklist = state.mOriginalGemChecklist;
+	this->mGemChecklist = state.mGemChecklist;
+	this->mCollectedGems = state.mCollectedGems;
+	this->mGemLocsOnMap = state.mGemLocsOnMap;
+	this->mReportedGemLocations = state.mReportedGemLocations;
+	this->mMaxDistance = state.mMaxDistance;
+	this->mMaxSteering = state.mMaxSteering;
+	this->mStartPosition = state.mStartPosition;
+	this->mRobot = state.mRobot;
+}
+
 State::~State()
 {
 }

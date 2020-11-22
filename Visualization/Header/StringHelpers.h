@@ -11,7 +11,10 @@ namespace StringHelpers
 	 */
 	std::vector<std::string> Split(const std::string& str, const std::string& delim);
 
-
+	/**
+	 * Trims leading and trailinng whitespace from the string
+	 */
+	std::string Trim(const std::string& str);
 }
 
 #endif // !STRING_HELPERS_H

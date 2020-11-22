@@ -5,17 +5,28 @@
 #include <fstream>
 #include <map>
 
+
 using namespace ArduinoCar_Visualization;
 using namespace std;
 
 
-ArduinoCar_Visualization::Simulation::Simulation(ResourceManager& resourceManager) : mResourceManager(resourceManager)
+ArduinoCar_Visualization::Simulation::Simulation(ResourceManager& resourceManager) : mResourceManager(resourceManager), mState(nullptr)
 {
+}
+
+ArduinoCar_Visualization::Simulation::Simulation(const Simulation& simulation) : mResourceManager(simulation.mResourceManager)
+{
+	this->Objects = simulation.Objects;
+	this->mState = new ArduinoCar_Core::State(*simulation.mState);
+	this->mAccumTime = simulation.mAccumTime;
+	this->mActualTime = simulation.mActualTime;
+	this->mTimeStep = simulation.mTimeStep;
 }
 
 
 Simulation::~Simulation()
 {
+	delete mState;
 }
 
 bool ArduinoCar_Visualization::Simulation::IsCompleted()
@@ -70,9 +81,9 @@ void Simulation::FromFile(const std::string& fileName)
 		{
 			keyVal["needed_gems"] = fieldVal[1];
 		}
-		else if (fieldVal[0].find("horizon distance") != string::npos)
+		else if (fieldVal[0].find("max distance") != string::npos)
 		{
-			keyVal["horizontal_distance"] = fieldVal[1];
+			keyVal["max_distance"] = fieldVal[1];
 		}
 		else if (fieldVal[0].find("max steering") != string::npos)
 		{
@@ -90,6 +101,8 @@ void Simulation::FromFile(const std::string& fileName)
 		{
 			cout << "ERROR::SIMULATION: Failed to read simulation file keyvalue in file: " 
 				<< fileName << " Field: " << fieldVal[0] << endl;
+
+			exit(1);
 		}
 	}
 
@@ -97,7 +110,8 @@ void Simulation::FromFile(const std::string& fileName)
 	GenerateMap(keyVal["area_map"]);
 
 	// TODO: Generate State based on simulation parameters
-	//GenerateState(...)
+	GenerateState(keyVal["area_map"], keyVal["needed_gems"], keyVal["max_distance"], 
+		keyVal["max_steering"],  keyVal["robot_distance_noise"], keyVal["robot_bearing_noise"]);
 
 	return;
 }
@@ -116,11 +130,11 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 
 	while (mAccumTime >= mTimeStep)
 	{
-		mActualTime += mTimeStep;
-		mAccumTime -= mTimeStep;
-
-		// Update Robot and Gems
-
+		this->mActualTime += this->mTimeStep;
+		this->mAccumTime -= this->mTimeStep;
+		
+		// Update the state
+		//this->mState->UpdateAccordingTo()
 	}
 }
 
@@ -174,4 +188,45 @@ void ArduinoCar_Visualization::Simulation::GenerateMap(const std::string& mapStr
 	//glm::vec2 size(mapW, mapH);
 	//SimulationObject ground(loc, size, mResourceManager.GetTexture("face"));
 	//this->Objects.push_back(ground);
+}
+
+void ArduinoCar_Visualization::Simulation::GenerateState(const std::string& mapString, const std::string& neededGems, 
+	const std::string& maxDistance, const std::string& maxSteering, const std::string& robotDistanceNoise, const std::string& robotBearingNoise)
+{
+	vector<vector<char>> areaMap;
+	list<char> gemChecklist;
+	double maxDist = -1;
+	double maxSteer = -1;
+	double robotDistNoise = -1;
+	double robotBearNoise = -1;
+
+	// Parse map
+	vector<char> mapRow;
+	for (size_t i = 0; i < mapString.length(); i++)
+	{
+		if (mapString[i] == ',')
+		{
+			areaMap.push_back(mapRow);
+			mapRow.clear();
+		}
+		else
+		{
+			mapRow.push_back(mapString[i]);
+		}
+	}
+
+	// Parse needed gems
+	vector<string> gemsStr = StringHelpers::Split(StringHelpers::Trim(neededGems), ", ");
+	for (size_t i = 0; i < gemsStr.size(); i++)
+	{
+		gemChecklist.push_back(gemsStr[i][0]);
+	}
+
+	// Parse max distance
+	maxDist = stod(StringHelpers::Trim(maxDistance));
+	maxSteer = stod(StringHelpers::Trim(maxSteering));
+	robotDistNoise = stod(StringHelpers::Trim(robotDistanceNoise));
+	robotBearNoise = stod(StringHelpers::Trim(robotBearingNoise));
+
+	mState = new ArduinoCar_Core::State(areaMap, gemChecklist, maxDist, maxSteer, robotDistNoise, robotBearNoise);
 }

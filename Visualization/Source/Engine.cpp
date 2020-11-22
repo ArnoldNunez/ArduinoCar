@@ -45,12 +45,12 @@ void Engine::Init()
 	Simulation simulation2(this->mResourceManager);
 	simulation2.FromFile("Simulation2.sim");
 
-	Simulation simulation3(this->mResourceManager);
-	simulation2.FromFile("Simulation3.sim");
+	//Simulation simulation3(this->mResourceManager);
+	//simulation2.FromFile("Simulation3.sim");
 
 	this->Tests.push_back(simulation1);
 	this->Tests.push_back(simulation2);
-	this->Tests.push_back(simulation3);
+	//this->Tests.push_back(simulation3);
 	this->Test = 0;
 }
 

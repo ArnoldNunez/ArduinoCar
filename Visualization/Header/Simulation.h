@@ -3,6 +3,8 @@
 
 #include "ResourceManager.h"
 #include "SimulationObject.h"
+#include "../../ArduinoCar/Header/State.h"
+#include "../../ArduinoCar/Header/SLAM.h"
 
 #include <vector>
 
@@ -26,6 +28,11 @@ namespace ArduinoCar_Visualization
 		 * Constructor
 		 */
 		Simulation(ResourceManager& resourceManager);
+
+		/**
+		 * Copy constructor
+		 */
+		Simulation(const Simulation& simulation);
 
 		/**
 		 * Destructor
@@ -65,12 +72,20 @@ namespace ArduinoCar_Visualization
 		 */
 		void GenerateMap(const std::string& mapString);
 
+		/**
+		 * Generates the simulation state with the read in simulation parameters
+		 */
+		void GenerateState(const std::string& mapString, const std::string& neededGems, const std::string& maxDistance,
+			const std::string& maxSteering, const std::string& robotDistanceNoise, const std::string& robotBearingNoise);
 
 		ResourceManager& mResourceManager;
+		ArduinoCar_Core::State* mState;
+		ArduinoCar_Core::SLAM mSLAM;
 
 		unsigned int mAccumTime = 0;	// Total accumulated time (ms)
 		unsigned int mActualTime = 0;	// The actual time(ms)
 		unsigned int mTimeStep = 1000;	// The 'physics' update period (ms)
+		unsigned int mRobotNdx = 0;		// Index of the robot in the simulation objects
 	};
 }
 

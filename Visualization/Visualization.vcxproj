@@ -171,6 +171,11 @@
     <None Include="Shaders\fragment_shader.frag" />
     <None Include="Shaders\vertex_shader.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ArduinoCar\ArduinoCar.vcxproj">
+      <Project>{dff41892-94f3-4cc6-950e-fb7c40146d0f}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

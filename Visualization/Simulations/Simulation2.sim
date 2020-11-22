@@ -1,6 +1,6 @@
 area map = A......B, .F..@..G, .E.....H, C...I..D
 needed gems = A, B, C, D
-horizon distance = 4.0
+max distance = 4.0
 max steering = 1.58079632679
 robot distance noise = 0.05
 robot bearing noise = 0.02

@@ -21,3 +21,13 @@ vector<string> StringHelpers::Split(const std::string& str, const std::string& d
 
 	return tokens;
 }
+
+std::string StringHelpers::Trim(const std::string& str)
+{
+	const size_t strBegin = str.find_first_not_of(" \t");
+	if (strBegin == std::string::npos) { return ""; }
+
+	const size_t strEnd = str.find_last_not_of(" \t");
+
+	return str.substr(strBegin, strEnd - strBegin + 1);
+}

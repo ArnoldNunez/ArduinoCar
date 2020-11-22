@@ -47,6 +47,11 @@ namespace ArduinoCar_Core
 			double robotBearingNoise);
 
 		/**
+		 * Copy constructor
+		 */
+		State(const State& state);
+
+		/**
 		 * Destructor
 		 */
 		virtual ~State();
