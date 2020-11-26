@@ -7,6 +7,7 @@
 
 #include <string>
 #include <map>
+#include <list>
 
 namespace ArduinoCar_Core
 {
@@ -49,12 +50,23 @@ namespace ArduinoCar_Core
 		 */
 		Point2D ProcessMovement(double steering, double distance, double motionNoise = 0.01);
 
+		/**
+		 * Gets the computed estimation matrix
+		 * \return Matrix The mu matrix containing the estimated positions for landmarks.
+		 */
+		Matrix GetEstimateMatrix() const { return this->mMu; };
+
+		/**
+		 * Gets the landmark index mapping
+		 */
+		std::map<unsigned int, int> GetLandmarkNdxMap() const { return this->mLandmarkNdxMap; };
 
 	private:
 
 		/// SLAM matrices
 		Matrix mOmega;
 		Matrix mXi;
+		Matrix mMu;
 
 		/// Tuneable SLAM parameters
 		double mInitLocConstr;

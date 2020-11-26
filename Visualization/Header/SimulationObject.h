@@ -28,6 +28,8 @@ namespace ArduinoCar_Visualization
 		/// The sprite associated with this object
 		Texture2D Sprite;
 
+		std::string Name;	// Name of the object
+
 		/**
 		 * Constructor
 		 */

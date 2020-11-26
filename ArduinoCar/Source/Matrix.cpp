@@ -137,11 +137,11 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Take(const std::vector<int>& li
 	Matrix res;
 	res.Zero(list1.size(), listTwo.size());
 
-	for (int i = 0; i < mDimX; i++)
+	for (int i = 0; i < list1.size(); i++)
 	{
-		for (int j = 0; j < mDimY; j++)
+		for (int j = 0; j < listTwo.size(); j++)
 		{
-			res.mValue[j][i] = mValue[list1[i]][listTwo[j]];
+			res.mValue[i][j] = mValue[list1[i]][listTwo[j]];
 		}
 	}
 
@@ -161,11 +161,11 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Expand(int dimX, int dimY, cons
 	Matrix res;
 	res.Zero(dimX, dimY);
 
-	for (int i = 0; i < mDimX; i++)
+	for (int i = 0; i < list1.size(); i++)
 	{
-		for (int j = 0; j < mDimY; j++)
+		for (int j = 0; j < list2.size(); j++)
 		{
-			res.mValue[list1[j]][listTwo[i]] = mValue[i][j];
+			res.mValue[list1[i]][listTwo[j]] = mValue[i][j];
 		}
 	}
 
@@ -174,6 +174,11 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Expand(int dimX, int dimY, cons
 
 ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Cholesky(double zTol)
 {
+	/**
+	 * Computes upper triangular cholesky factorization of a positive definite matrix.
+	 * http://adorio-research.org/wordpress/?p=4560
+	 */
+
 	Matrix res;
 	res.Zero(mDimX, mDimY);
 
@@ -193,7 +198,7 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Cholesky(double zTol)
 		else
 		{
 			if (d < 0.0) { throw domain_error("Matrix not positive-definite"); }
-			res.mValue[i][i] = 0.0;
+			res.mValue[i][i] = sqrt(d);
 		}
 
 		
@@ -226,7 +231,7 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::CholeskyInverse()
 	Matrix res;
 	res.Zero(mDimX, mDimY);
 
-	for (int j = mDimX; j >= 0; j--)
+	for (int j = mDimX - 1; j >= 0; j--)
 	{
 		double tjj = mValue[j][j];
 
@@ -237,6 +242,8 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::CholeskyInverse()
 		}
 
 		res.mValue[j][j] = 1.0 / pow(tjj, 2.0) - s / tjj;
+
+		// TODO: Fix this, should be going backwards
 		for (int i = 0; i >= 0; i--)
 		{
 			double a = 0.0;
@@ -262,20 +269,23 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Inverse()
 
 ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Multiply(const Matrix& mat)
 {
-	if (mDimX != mat.mDimX || mDimY != mat.mDimY)
+	if (mDimY != mat.mDimX)
 	{
 		throw invalid_argument("Invalid size of matrix");
 	}
 	else
 	{
 		Matrix res;
-		res.Zero(mDimX, mDimY);
+		res.Zero(mDimX, mat.mDimY);
 
 		for (int i = 0; i < mDimX; i++)
 		{
-			for (int j = 0; j < mDimY; j++)
+			for (int j = 0; j < mat.mDimY; j++)
 			{
-				res.mValue[i][j] = mValue[i][j] * mat.mValue[i][j];
+				for (int k = 0; k < mDimY; k++)
+				{
+					res.mValue[i][j] = mValue[i][k] * mat.mValue[k][j];
+				}
 			}
 		}
 

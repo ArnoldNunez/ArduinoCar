@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="ArduinoCar.cpp" />
     <ClCompile Include="Source\Gem.cpp" />
+    <ClCompile Include="Source\GemExtractor.cpp" />
     <ClCompile Include="Source\GemMeasurement.cpp" />
     <ClCompile Include="Source\MathHelpers.cpp" />
     <ClCompile Include="Source\Matrix.cpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header\Gem.h" />
+    <ClInclude Include="Header\GemExtractor.h" />
     <ClInclude Include="Header\GemMeasurement.h" />
     <ClInclude Include="Header\MathHelpers.h" />
     <ClInclude Include="Header\Matrix.h" />

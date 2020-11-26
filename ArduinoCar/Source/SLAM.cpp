@@ -64,14 +64,21 @@ ArduinoCar_Core::Point2D ArduinoCar_Core::SLAM::ProcessMeasurements(const std::m
 
 		// We have higher belief in measurements closer to the robot due to sensor
 		double noiseSigma = pow(exp(1.0), kvp.second.GetDistance()) / 40.0;
+		noiseSigma = 1.0;
 
 		// Update the information matrix based on the measurement
 		for (int b = 0; b < 2; b++)
 		{
-			mOmega(b, b, mOmega(b, b) + (1.0 / noiseSigma));
-			mOmega(m + b, m + b, mOmega(m + b, m + b) + (1.0 / noiseSigma));
-			mOmega(b, m + b, mOmega(b, m + b) - (1.0 / noiseSigma));
-			mOmega(m + b, m, mOmega(m +b, b) - (1.0 / noiseSigma));
+			double ulVal = mOmega(b, b) + (1.0 / noiseSigma);
+			double lrVal = mOmega(m + b, m + b) + (1.0 / noiseSigma);
+
+			double urVal = mOmega(b, m + b) + (-1.0 / noiseSigma);
+			double llVal = mOmega(m + b, b) + (-1.0 / noiseSigma);
+
+			mOmega(b, b, ulVal);
+			mOmega(m + b, m + b, lrVal);
+			mOmega(b, m + b, urVal);
+			mOmega(m + b, b, llVal);
 
 			mXi(b, 0, mXi(b, 0) - deltaLandmPos[b] * (1.0 / noiseSigma));
 			mXi(m + b, 0, mXi(m + b, 0) + deltaLandmPos[b] * (1.0 / noiseSigma));
@@ -128,13 +135,14 @@ ArduinoCar_Core::Point2D ArduinoCar_Core::SLAM::ProcessMovement(double steering,
 	Matrix b = mOmega.Take(tempIndices, emptyVector);
 	Matrix c = mXi.Take(tempIndices, xiIndices);
 	mOmega = mOmega.Take(takeIndices, emptyVector) - a.Transpose().Multiply(b.Inverse().Multiply(a));
-	mXi = mXi.Take(takeIndices, xiIndices) - a.Transpose().Multiply(b.Inverse().Multiply(a));
+	mXi = mXi.Take(takeIndices, xiIndices) - a.Transpose().Multiply(b.Inverse().Multiply(c));
 
 
 	// Compute best estimate
-	Matrix mu = mOmega.Inverse().Multiply(mXi);
-	double x = mu(0, 0);
-	double y = mu(1, 0);
+	//Matrix mu = mOmega.Inverse().Multiply(mXi);
+	this->mMu = mOmega.Inverse().Multiply(mXi);
+	double x = this->mMu(0, 0);
+	double y = mMu(1, 0);
 
 	Point2D pt(x, y);
 	mPrevEstimatedPos = mEstimatedPos;

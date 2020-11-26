@@ -10,7 +10,8 @@ using namespace ArduinoCar_Visualization;
 using namespace std;
 
 
-ArduinoCar_Visualization::Simulation::Simulation(ResourceManager& resourceManager) : mResourceManager(resourceManager), mState(nullptr)
+ArduinoCar_Visualization::Simulation::Simulation(ResourceManager& resourceManager) 
+	: mResourceManager(resourceManager), mState(nullptr), mGemExtractor(nullptr)
 {
 }
 
@@ -18,6 +19,7 @@ ArduinoCar_Visualization::Simulation::Simulation(const Simulation& simulation) :
 {
 	this->Objects = simulation.Objects;
 	this->mState = new ArduinoCar_Core::State(*simulation.mState);
+	this->mGemExtractor = new ArduinoCar_Core::GemExtractor(simulation.mGemExtractor->GetMaxDistance(), simulation.mGemExtractor->GetMaxSteering());
 	this->mAccumTime = simulation.mAccumTime;
 	this->mActualTime = simulation.mActualTime;
 	this->mTimeStep = simulation.mTimeStep;
@@ -26,7 +28,8 @@ ArduinoCar_Visualization::Simulation::Simulation(const Simulation& simulation) :
 
 Simulation::~Simulation()
 {
-	delete mState;
+	delete this->mState;
+	delete this->mGemExtractor;
 }
 
 bool ArduinoCar_Visualization::Simulation::IsCompleted()
@@ -106,12 +109,11 @@ void Simulation::FromFile(const std::string& fileName)
 		}
 	}
 
-
 	GenerateMap(keyVal["area_map"]);
 
 	// TODO: Generate State based on simulation parameters
 	GenerateState(keyVal["area_map"], keyVal["needed_gems"], keyVal["max_distance"], 
-		keyVal["max_steering"],  keyVal["robot_distance_noise"], keyVal["robot_bearing_noise"]);
+		keyVal["max_steering"],  keyVal["robot_distance_noise"], keyVal["robot_bearing_noise"]);	
 
 	return;
 }
@@ -126,15 +128,53 @@ void ArduinoCar_Visualization::Simulation::Draw(SpriteRenderer& renderer)
 
 void ArduinoCar_Visualization::Simulation::Update(float dt)
 {
-	mAccumTime += dt;
+	this->mAccumTime += dt;
+	//std::cout << "Elapsed ms: " << dt  << " Accumulated ms: " << this->mAccumTime << std::endl;
 
-	while (mAccumTime >= mTimeStep)
+
+	while (this->mAccumTime >= this->mTimeStep)
 	{
 		this->mActualTime += this->mTimeStep;
 		this->mAccumTime -= this->mTimeStep;
-		
+
+		for (size_t i = 0; i < this->Objects.size(); i++)
+		{
+			// Update the robot location
+			if (this->Objects[i].Name == "Robot")
+			{
+				double posX = this->mState->GetRobot().GetX();
+				double posY = this->mState->GetRobot().GetY();
+				this->Objects[i].Position = glm::vec2(posX, posY);
+			}
+		}
+
 		// Update the state
-		//this->mState->UpdateAccordingTo()
+		std::map<unsigned int, ArduinoCar_Core::GemMeasurement> measurementMap;
+		this->mState->GenerateMeasurements(false, measurementMap);
+		
+		const std::map<unsigned int, ArduinoCar_Core::GemMeasurement>& mMap = measurementMap;
+		string nextMove = this->mGemExtractor->NextMove(this->mState->GetGemChecklist(), mMap);
+		std::cout << nextMove << std::endl;
+
+
+		//const std::list<ArduinoCar_Core::Gem>& gemMapLocs = this->mState->GetGemMapLocs();
+		//for (std::list<ArduinoCar_Core::Gem>::const_iterator it = gemMapLocs.begin(); it != gemMapLocs.end(); it++)
+		//{
+		//	for (size_t j = 0; j < this->Objects.size(); j++)
+		//	{
+		//		// Update the robot location
+		//		if (this->Objects[j].Name[0] == it->Type)
+		//		{
+		//			double posX = it->X;
+		//			double posY = it->Y;
+		//			this->Objects[j].Position = glm::vec2(posX, posY);
+		//		}
+		//	}
+		//}
+
+		vector<string> actions = StringHelpers::Split(nextMove, " ");
+		this->mState->UpdateAccordingTo(actions, true);
+		std::cout << "Robot pos: (" << this->mState->GetRobot().GetX() << ", " << this->mState->GetRobot().GetY() << ")" << std::endl;
 	}
 }
 
@@ -161,9 +201,11 @@ void ArduinoCar_Visualization::Simulation::GenerateMap(const std::string& mapStr
 		else if (mapString[i] == '@')
 		{
 			glm::vec2 loc(posX, posY);
-			glm::vec2 size(40.0f, 40.0f);
+			/*glm::vec2 size(40.0f, 40.0f);*/
+			glm::vec2 size(0.5f, 0.5f);
 
 			SimulationObject rbt(loc, size, mResourceManager.GetTexture("turtle"));
+			rbt.Name = "Robot";
 			this->Objects.push_back(rbt);
 
 			posX += Simulation::MAP_HORIZ_SPACING;
@@ -171,10 +213,12 @@ void ArduinoCar_Visualization::Simulation::GenerateMap(const std::string& mapStr
 		else if (mapString[i] >= 65 && mapString[i] <= 122)
 		{
 			glm::vec2 loc(posX, posY);
-			glm::vec2 size(30.0f, 30.0f);
+			/*glm::vec2 size(30.0f, 30.0f);*/
+			glm::vec2 size(0.5f, 0.5f);
 			glm::vec3 color(245.0f, 245.0f, 0.0f);
 
 			SimulationObject gem(loc, size, mResourceManager.GetTexture("gem"));
+			gem.Name = mapString[i];
 			gem.Color = color;
 			this->Objects.push_back(gem);
 
@@ -209,11 +253,13 @@ void ArduinoCar_Visualization::Simulation::GenerateState(const std::string& mapS
 			areaMap.push_back(mapRow);
 			mapRow.clear();
 		}
-		else
+		else if (mapString[i] != ' ')
 		{
 			mapRow.push_back(mapString[i]);
 		}
 	}
+
+	areaMap.push_back(mapRow);
 
 	// Parse needed gems
 	vector<string> gemsStr = StringHelpers::Split(StringHelpers::Trim(neededGems), ", ");
@@ -228,5 +274,6 @@ void ArduinoCar_Visualization::Simulation::GenerateState(const std::string& mapS
 	robotDistNoise = stod(StringHelpers::Trim(robotDistanceNoise));
 	robotBearNoise = stod(StringHelpers::Trim(robotBearingNoise));
 
-	mState = new ArduinoCar_Core::State(areaMap, gemChecklist, maxDist, maxSteer, robotDistNoise, robotBearNoise);
+	this->mState = new ArduinoCar_Core::State(areaMap, gemChecklist, maxDist, maxSteer, robotDistNoise, robotBearNoise);
+	this->mGemExtractor = new ArduinoCar_Core::GemExtractor(maxDist, maxSteer);
 }

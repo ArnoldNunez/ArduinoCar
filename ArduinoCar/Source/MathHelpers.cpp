@@ -14,8 +14,8 @@ double MathHelpers::ComputeDistance(const ArduinoCar_Core::Point2D& p1, const Ar
 
 double MathHelpers::ComputeBearing(const ArduinoCar_Core::Point2D& p1, const ArduinoCar_Core::Point2D& p2)
 {
-	double dx = p1.X - p2.X;
-	double dy = p1.Y - p2.Y;
+	double dx = p2.X - p1.X;
+	double dy = p2.Y - p1.Y;
 
 	return atan2(dy, dx);
 }

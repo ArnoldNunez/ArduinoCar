@@ -61,12 +61,27 @@ namespace ArduinoCar_Core
 		 * The resulting measurements are place dinto the input list.
 		 * Generates measurements with noise if flag set.
 		 */
-		void GenerateMeasurements(bool noiseFlag, std::map<int, GemMeasurement>& out);
+		void GenerateMeasurements(bool noiseFlag, std::map<unsigned int, GemMeasurement>& out);
 
 		/**
 		 * Updates the state acording to the given action
 		 */
 		void UpdateAccordingTo(const std::vector<std::string>& action, bool noiseFlag);
+
+		/**
+		 * Gets the gem checklist.
+		 */
+		std::list<char> GetGemChecklist() const { return mGemChecklist; }
+
+		/**
+		 * Gets the robot.
+		 */
+		const Robot& GetRobot() const { return mRobot; }
+
+		/**
+		 * Gets the gem locations on the map
+		 */
+		const std::list<Gem> GetGemMapLocs() const { return mGemLocsOnMap; }
 
 
 	private:

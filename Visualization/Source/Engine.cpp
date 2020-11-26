@@ -20,8 +20,9 @@ void Engine::Init()
 		nullptr, "sprite");
 
 	// Configure shaders
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->mWidth),
-		static_cast<float>(this->mHeight), 0.0f, -1.0f, 1.0f);
+	/*glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->mWidth),
+		static_cast<float>(this->mHeight), 0.0f, -1.0f, 1.0f);*/
+	glm::mat4 projection = glm::ortho(-2.0f, 10.0f, 10.0f, -3.0f, -1.0f, 1.0f);
 
 	this->mResourceManager.GetShader("sprite").Use().SetInteger("image", 0);
 	this->mResourceManager.GetShader("sprite").SetMatrix4("projection", projection);

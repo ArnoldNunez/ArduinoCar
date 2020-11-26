@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         engine.ProcessInput(deltaTime);
 
         // Update engine state
-        engine.Update(deltaTime);
+        engine.Update(deltaTime * 1000.0);
 
         // Render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

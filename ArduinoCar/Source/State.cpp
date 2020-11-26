@@ -98,16 +98,19 @@ State::State(const std::vector<std::vector<char>>& map, const std::list<char>& g
 	{
 		for (size_t j = 0; j < cols; j++)
 		{
+			double coordX = (double)j;
+			double coordY = -(double)i;
+
 			// Check if uppercase ascii letter A - Z
 			if (map[i][j] >= 65 && map[i][j] <= 90)
 			{
-				Gem gem(gemId, (double)i, (double)j, map[i][j]);
+				Gem gem(gemId, coordX, coordY, map[i][j]);
 				this->mGemLocsOnMap.push_back(gem);
 				++gemId;
 			}
 			else if (map[i][j] == '@')
 			{
-				this->mStartPosition = Point2D((double)i, (double)j);
+				this->mStartPosition = Point2D(coordX + 0.5, coordY - 0.5);
 			}
 		}
 	}
@@ -138,7 +141,7 @@ State::~State()
 
 
 
-void State::GenerateMeasurements(bool noiseFlag, std::map<int, GemMeasurement>& out)
+void State::GenerateMeasurements(bool noiseFlag, std::map<unsigned int, GemMeasurement>& out)
 {
 	for (const Gem& gemLocation : this->mGemLocsOnMap)
 	{

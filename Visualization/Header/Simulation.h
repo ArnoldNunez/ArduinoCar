@@ -4,7 +4,7 @@
 #include "ResourceManager.h"
 #include "SimulationObject.h"
 #include "../../ArduinoCar/Header/State.h"
-#include "../../ArduinoCar/Header/SLAM.h"
+#include "../../ArduinoCar/Header/GemExtractor.h"
 
 #include <vector>
 
@@ -13,8 +13,8 @@ namespace ArduinoCar_Visualization
 	class Simulation
 	{
 	public:
-		static const int MAP_HORIZ_SPACING = 100.0f;		// horizontal resolution
-		static const int MAP_VERTICAL_SPACING = 100.0f;		// vertical resolution
+		static const int MAP_HORIZ_SPACING = 1.0f;		// horizontal resolution
+		static const int MAP_VERTICAL_SPACING = 1.0f;	// vertical resolution
 
 
 		/**
@@ -80,9 +80,9 @@ namespace ArduinoCar_Visualization
 
 		ResourceManager& mResourceManager;
 		ArduinoCar_Core::State* mState;
-		ArduinoCar_Core::SLAM mSLAM;
+		ArduinoCar_Core::GemExtractor* mGemExtractor;
 
-		unsigned int mAccumTime = 0;	// Total accumulated time (ms)
+		double mAccumTime = 0;			// Total accumulated time (ms)
 		unsigned int mActualTime = 0;	// The actual time(ms)
 		unsigned int mTimeStep = 1000;	// The 'physics' update period (ms)
 		unsigned int mRobotNdx = 0;		// Index of the robot in the simulation objects
