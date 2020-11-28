@@ -244,7 +244,7 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::CholeskyInverse()
 		res.mValue[j][j] = 1.0 / pow(tjj, 2.0) - s / tjj;
 
 		// TODO: Fix this, should be going backwards
-		for (int i = 0; i >= 0; i--)
+		for (int i = j - 1; i >= 0; i--)
 		{
 			double a = 0.0;
 			for (int k = i + 1; k < mDimX; k++)
@@ -252,7 +252,7 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::CholeskyInverse()
 				a += mValue[i][k] * res.mValue[k][j];
 			}
 
-			res.mValue[i][j] = -a;
+			res.mValue[i][j] = -a / mValue[i][i];
 			res.mValue[j][i] = res.mValue[i][j];
 		}
 	}
