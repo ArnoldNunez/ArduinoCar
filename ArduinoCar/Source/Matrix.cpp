@@ -243,7 +243,6 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::CholeskyInverse()
 
 		res.mValue[j][j] = 1.0 / pow(tjj, 2.0) - s / tjj;
 
-		// TODO: Fix this, should be going backwards
 		for (int i = j - 1; i >= 0; i--)
 		{
 			double a = 0.0;
