@@ -283,7 +283,7 @@ ArduinoCar_Core::Matrix ArduinoCar_Core::Matrix::Multiply(const Matrix& mat)
 			{
 				for (int k = 0; k < mDimY; k++)
 				{
-					res.mValue[i][j] = mValue[i][k] * mat.mValue[k][j];
+					res.mValue[i][j] += mValue[i][k] * mat.mValue[k][j];
 				}
 			}
 		}

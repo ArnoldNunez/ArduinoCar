@@ -54,6 +54,7 @@ std::string ArduinoCar_Core::GemExtractor::NextMove(const std::list<char>& neede
 	}
 
 	string action = "";
+	Point2D robotPos(-1.0, -1.0);
 	if (measurements.at(measId).GetDistance() < this->mMinExtractDist)
 	{
 		double estGemX = this->mSLAM.GetEstimateMatrix()(this->mSLAM.GetLandmarkNdxMap()[measId], 0);
@@ -64,11 +65,12 @@ std::string ArduinoCar_Core::GemExtractor::NextMove(const std::list<char>& neede
 	{
 		// Estimate robot position using Online GraphSLAM
 		this->mSLAM.ProcessMeasurements(measurements);
-		Point2D robotPos = this->mSLAM.ProcessMovement(steering, distance);
-		cout << "ROBOT POS: (" << robotPos.X << ", " << robotPos.Y << ")" << endl;
-
+		robotPos = this->mSLAM.ProcessMovement(steering, distance);
 		action = "move " + to_string(steering) + " " + to_string(distance);
 	}
+
+	cout << "ROBOT POS: (" << robotPos.X << ", " << robotPos.Y << ")" << endl;
+	cout << "Action: " << action << endl;
 
 	return action;
 }

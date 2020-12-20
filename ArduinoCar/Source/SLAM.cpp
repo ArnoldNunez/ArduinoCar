@@ -116,10 +116,17 @@ ArduinoCar_Core::Point2D ArduinoCar_Core::SLAM::ProcessMovement(double steering,
 	}
 	for (int b = 0; b < 2; b++)
 	{
-		mOmega(b, b + 2, mOmega(b, b + 2) + (-1.0 / motionNoise));
-		mOmega(b + 2, b, mOmega(b + 2, b) + (-1.0 / motionNoise));
-		mXi(b, 0, mOmega(b, 0) + (-deltaRobMotion[b] / motionNoise));
-		mXi(b + 2, 0, mOmega(b + 2, 0) + (deltaRobMotion[b] / motionNoise));
+		double topRight = mOmega(b, b + 2) + (-1.0 / motionNoise);
+		double bottomLeft = mOmega(b + 2, b) + (-1.0 / motionNoise);
+
+		mOmega(b, b + 2, topRight);
+		mOmega(b + 2, b, bottomLeft);
+
+		double topXi = mXi(b, 0) + (-deltaRobMotion[b] / motionNoise);
+		double bottomXi = mXi(b + 2, 0) + (deltaRobMotion[b] / motionNoise);
+
+		mXi(b, 0, topXi);
+		mXi(b + 2, 0, bottomXi);
 	}
 
 
