@@ -15,12 +15,10 @@ ArduinoCar_Core::Robot::Robot()
 	mY = 0.0;
 	mBearing = 0.0;
 	mMaxDistance = 1.0;
-	mMaxSteering = 3.14 / 2;
-	mDistNoise = 0.05;
+	mMaxSteering = MathHelpers::M_PI / 2;
 	mBearingNoise = 0.02;
-
 	mSteeringNoise = 0.0;
-	mDistanceNoise = 0.0;
+	mDistanceNoise = 0.05;
 	mMeasurementNoise = 0.0;
 }
 
@@ -32,13 +30,13 @@ ArduinoCar_Core::Robot::Robot(double x, double y, double bearing, double maxDist
 {
 	mX = x;
 	mY = y;
-	mBearing = 0.0;
-	mMaxDistance = 1.0;
-	mMaxSteering = 3.14 / 2;
-	mDistNoise = 0.05;
-	mBearingNoise = 0.02;
+	mBearing = bearing;
+	mMaxDistance = maxDistance;
+	mMaxSteering = maxSteering;
+	mBearingNoise = bearingNoise;
+	mDistanceNoise = distNoise;
+
 	mSteeringNoise = 0.0;
-	mDistanceNoise = 0.0;
 	mMeasurementNoise = 0.0;
 }
 
@@ -68,7 +66,7 @@ void ArduinoCar_Core::Robot::Move(double steering, double distance, bool noise)
 	distance = max(0.0, distance);
 	distance = min(mMaxDistance, distance);
 
-	mBearing = MathHelpers::TruncateAngle(mBearing + steering);
+	mBearing = MathHelpers::TruncateAngle(mBearing + (float)steering);
 	mX += distance * cos(mBearing);
 	mY += distance * sin(mBearing);
 }

@@ -80,7 +80,6 @@ namespace ArduinoCar_Core
 		double mBearing;
 		double mMaxDistance;
 		double mMaxSteering;
-		double mDistNoise;
 		double mBearingNoise;
 		double mSteeringNoise;
 		double mDistanceNoise;

@@ -173,7 +173,7 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 		//}
 
 		vector<string> actions = StringHelpers::Split(nextMove, " ");
-		this->mState->UpdateAccordingTo(actions, true);
+		this->mState->UpdateAccordingTo(actions, false);
 		std::cout << "Robot pos: (" << this->mState->GetRobot().GetX() << ", " << this->mState->GetRobot().GetY() << ")" << std::endl;
 	}
 }
