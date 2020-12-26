@@ -16,11 +16,15 @@ ArduinoCar_Core::GemExtractor::~GemExtractor()
 {
 }
 
-std::string ArduinoCar_Core::GemExtractor::NextMove(const std::list<char>& neededGems, const std::map<unsigned int, GemMeasurement>& measurements)
+ArduinoCar_Core::Command ArduinoCar_Core::GemExtractor::NextMove(const std::list<char>& neededGems, 
+	const std::map<unsigned int, GemMeasurement>& measurements)
 {
 	if (neededGems.size() == 0)
 	{
-		return "finished";
+		Command action;
+		action.Type = Command::Type::Finished;
+
+		return action;
 	}
 
 	// Determine next gem to extract
@@ -53,24 +57,30 @@ std::string ArduinoCar_Core::GemExtractor::NextMove(const std::list<char>& neede
 		steering = measurements.at(measId).GetBearing();
 	}
 
-	string action = "";
+	Command action;
 	Point2D robotPos(-1.0, -1.0);
 	if (measurements.at(measId).GetDistance() < this->mMinExtractDist)
 	{
 		double estGemX = this->mSLAM.GetEstimateMatrix()(this->mSLAM.GetLandmarkNdxMap()[measId], 0);
 		double estGemY = this->mSLAM.GetEstimateMatrix()(this->mSLAM.GetLandmarkNdxMap()[measId] + 1, 0);
-		action = "extract " + neededGems.front() + ' ' + to_string(estGemX) + ' ' + to_string(estGemY);
+
+		action.Type = Command::Type::Extract;
+		action.Gem = neededGems.front();
+		action.GemX = estGemX;
+		action.GemY = estGemY;
 	}
 	else
 	{
 		// Estimate robot position using Online GraphSLAM
 		this->mSLAM.ProcessMeasurements(measurements);
 		robotPos = this->mSLAM.ProcessMovement(steering, distance);
-		action = "move " + to_string(steering) + " " + to_string(distance);
+
+		action.Type = Command::Type::Move;
+		action.Bearing = steering;
+		action.Distance = distance;
 	}
 
-	cout << "ROBOT POS: (" << robotPos.X << ", " << robotPos.Y << ")" << endl;
-	cout << "Action: " << action << endl;
+	cout << "Action: " << action.Type << " " << to_string(action.Bearing) << " " << to_string(action.Distance) << endl;
 
 	return action;
 }

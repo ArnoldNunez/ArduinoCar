@@ -5,6 +5,7 @@
 #include "Point2D.h"
 #include "GemMeasurement.h"
 #include "SLAM.h"
+#include "Command.h"
 
 #include <string>
 #include <map>
@@ -37,7 +38,7 @@ namespace ArduinoCar_Core
 		/**
 		 * Determines the next move to make to grab the needed gems.
 		 */
-		std::string NextMove(const std::list<char>& neededGems, const std::map<unsigned int, GemMeasurement>& measurements);
+		ArduinoCar_Core::Command NextMove(const std::list<char>& neededGems, const std::map<unsigned int, GemMeasurement>& measurements);
 
 		/**
 		 * Gets the max distance allowed for robot movement in one step

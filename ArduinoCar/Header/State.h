@@ -6,6 +6,7 @@
 #include "Gem.h"
 #include "Robot.h"
 #include "GemMeasurement.h"
+#include "Command.h"
 
 #include <vector>
 #include <list>
@@ -66,7 +67,7 @@ namespace ArduinoCar_Core
 		/**
 		 * Updates the state acording to the given action
 		 */
-		void UpdateAccordingTo(const std::vector<std::string>& action, bool noiseFlag);
+		void UpdateAccordingTo(const Command& action, bool noiseFlag);
 
 		/**
 		 * Gets the gem checklist.

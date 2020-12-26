@@ -22,5 +22,10 @@ double MathHelpers::ComputeBearing(const ArduinoCar_Core::Point2D& p1, const Ard
 
 double MathHelpers::TruncateAngle(double angle)
 {
-	return fmod((angle + M_PI), (2.0 * M_PI)) - M_PI;
+	return Mod((angle + M_PI), (2.0 * M_PI)) - M_PI;
+}
+
+double MathHelpers::Mod(double a, double n)
+{
+	return a - (n * floor(a / n));
 }

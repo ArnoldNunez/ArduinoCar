@@ -150,26 +150,28 @@ void State::GenerateMeasurements(bool noiseFlag, std::map<unsigned int, GemMeasu
 	}
 }
 
-void State::UpdateAccordingTo(const std::vector<std::string>& action, bool noiseFlag)
+void State::UpdateAccordingTo(const Command& action, bool noiseFlag)
 {
-	std::string actionType = action[0];
-
-	if (actionType == "move")
+	if (action.Type == Command::Type::Move)
 	{
-		double steering = atof(action[1].c_str());
-		double distance = atof(action[2].c_str());
+		this->_attemptMove(action.Bearing, action.Distance, noiseFlag);
 
-		this->_attemptMove(steering, distance, noiseFlag);
+		//double steering = atof(action[1].c_str());
+		//double distance = atof(action[2].c_str());
+
+		//this->_attemptMove(steering, distance, noiseFlag);
 	}
-	else if (actionType == "extract")
+	else if (action.Type == Command::Type::Extract)
 	{
-		char gemType = action[1][0];
-		if (action.size() == 4)
-		{
-			double currentX = atof(action[2].c_str());
-			double currentY = atof(action[3].c_str());
-			this->_attemptExtraction(gemType, currentX, currentY);
-		}
+		this->_attemptExtraction(action.Gem, -1, -1);
+
+		//char gemType = action[1][0];
+		//if (action.size() == 4)
+		//{
+		//	double currentX = atof(action[2].c_str());
+		//	double currentY = atof(action[3].c_str());
+		//	this->_attemptExtraction(gemType, currentX, currentY);
+		//}
 		/*else
 		{
 			this->_attemptExtraction(gemType);

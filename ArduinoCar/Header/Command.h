@@ -12,7 +12,7 @@ namespace ArduinoCar_Core
 		/**
 		 * The types of commands
 		 */
-		enum Type { Move, Extract };
+		enum Type { Move, Extract, Finished };
 
 		/**
 		 * The type of the command.
@@ -61,30 +61,6 @@ namespace ArduinoCar_Core
 		 */
 		Command(const Command& command);
 	};
-
-	Command::Command()
-	{
-		Type = Command::Type::Move;
-		Distance = 0;
-		Bearing = 0;
-		Gem = ' ';
-		GemX = 0;
-		GemY = 0;
-	}
-
-	Command::~Command()
-	{
-	}
-
-	Command::Command(const Command& command)
-	{
-		Type = command.Type;
-		Distance = command.Distance;
-		Bearing = command.Bearing;
-		Gem = command.Gem;
-		GemX = command.GemX;
-		GemY = command.GemY;
-	}
 }
 
 #endif // !COMMAND_H

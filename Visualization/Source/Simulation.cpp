@@ -1,5 +1,6 @@
 #include "..\Header\Simulation.h"
 #include "..\Header\StringHelpers.h"
+#include "..\..\ArduinoCar\Header\Command.h"
 
 #include <iostream>
 #include <fstream>
@@ -153,9 +154,7 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 		this->mState->GenerateMeasurements(false, measurementMap);
 		
 		const std::map<unsigned int, ArduinoCar_Core::GemMeasurement>& mMap = measurementMap;
-		string nextMove = this->mGemExtractor->NextMove(this->mState->GetGemChecklist(), mMap);
-		std::cout << nextMove << std::endl;
-
+		ArduinoCar_Core::Command nextCommand = this->mGemExtractor->NextMove(this->mState->GetGemChecklist(), mMap);
 
 		//const std::list<ArduinoCar_Core::Gem>& gemMapLocs = this->mState->GetGemMapLocs();
 		//for (std::list<ArduinoCar_Core::Gem>::const_iterator it = gemMapLocs.begin(); it != gemMapLocs.end(); it++)
@@ -172,8 +171,7 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 		//	}
 		//}
 
-		vector<string> actions = StringHelpers::Split(nextMove, " ");
-		this->mState->UpdateAccordingTo(actions, false);
+		this->mState->UpdateAccordingTo(nextCommand, false);
 		std::cout << "Robot pos: (" << this->mState->GetRobot().GetX() << ", " << this->mState->GetRobot().GetY() << ")" << std::endl;
 	}
 }

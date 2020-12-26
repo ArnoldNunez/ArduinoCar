@@ -22,6 +22,11 @@ namespace MathHelpers
 	 * Truncates and angle between -pi and pi
 	 */
 	double TruncateAngle(double angle);
+
+	/**
+	 * Remainder operator for doubles.
+	 */
+	double Mod(double a, double n);
 }
 
 #endif // !MATH_HELPERS_H
