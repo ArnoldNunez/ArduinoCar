@@ -1,5 +1,6 @@
 #include "..\Header\Engine.h"
 
+#include <iostream>
 
 using namespace ArduinoCar_Visualization;
 
@@ -57,7 +58,17 @@ void Engine::Init()
 
 void Engine::Update(float dt)
 {
-	this->Tests[this->Test].Update(dt);
+	if (!this->Tests[this->Test].IsCompleted())
+	{
+		this->Tests[this->Test].Update(dt);
+	}
+	else
+	{
+		if (this->Test + 1U < this->Tests.size())
+		{
+			this->Test++;
+		}
+	}
 }
 
 void Engine::ProcessInput(float dt)

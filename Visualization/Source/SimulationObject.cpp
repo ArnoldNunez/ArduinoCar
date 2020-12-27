@@ -17,5 +17,8 @@ SimulationObject::~SimulationObject()
 
 void SimulationObject::Draw(SpriteRenderer& renderer)
 {
-    renderer.DrawSprite(this->Sprite, this->Position, this->Size, this->Rotation, this->Color);
+    if (!this->Destroyed)
+    {
+        renderer.DrawSprite(this->Sprite, this->Position, this->Size, this->Rotation, this->Color);
+    }
 }

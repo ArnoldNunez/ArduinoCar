@@ -12,7 +12,7 @@ using namespace std;
 
 
 ArduinoCar_Visualization::Simulation::Simulation(ResourceManager& resourceManager) 
-	: mResourceManager(resourceManager), mState(nullptr), mGemExtractor(nullptr)
+	: mResourceManager(resourceManager), mState(nullptr), mGemExtractor(nullptr), mIsComplete(false)
 {
 }
 
@@ -24,6 +24,7 @@ ArduinoCar_Visualization::Simulation::Simulation(const Simulation& simulation) :
 	this->mAccumTime = simulation.mAccumTime;
 	this->mActualTime = simulation.mActualTime;
 	this->mTimeStep = simulation.mTimeStep;
+	this->mIsComplete = simulation.mIsComplete;
 }
 
 
@@ -35,7 +36,7 @@ Simulation::~Simulation()
 
 bool ArduinoCar_Visualization::Simulation::IsCompleted()
 {
-	return false;
+	return this->mIsComplete;
 }
 
 void Simulation::FromFile(const std::string& fileName)
@@ -156,23 +157,35 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 		const std::map<unsigned int, ArduinoCar_Core::GemMeasurement>& mMap = measurementMap;
 		ArduinoCar_Core::Command nextCommand = this->mGemExtractor->NextMove(this->mState->GetGemChecklist(), mMap);
 
-		//const std::list<ArduinoCar_Core::Gem>& gemMapLocs = this->mState->GetGemMapLocs();
-		//for (std::list<ArduinoCar_Core::Gem>::const_iterator it = gemMapLocs.begin(); it != gemMapLocs.end(); it++)
-		//{
-		//	for (size_t j = 0; j < this->Objects.size(); j++)
-		//	{
-		//		// Update the robot location
-		//		if (this->Objects[j].Name[0] == it->Type)
-		//		{
-		//			double posX = it->X;
-		//			double posY = it->Y;
-		//			this->Objects[j].Position = glm::vec2(posX, posY);
-		//		}
-		//	}
-		//}
-
 		this->mState->UpdateAccordingTo(nextCommand, false);
 		std::cout << "Robot pos: (" << this->mState->GetRobot().GetX() << ", " << this->mState->GetRobot().GetY() << ")" << std::endl;
+
+
+		// Update object statuses
+		std::map<unsigned int, ArduinoCar_Core::GemMeasurement>::iterator it;
+		for (it = measurementMap.begin(); it != measurementMap.end(); it++)
+		{
+
+		}
+
+		for (const ArduinoCar_Core::Gem& gem : this->mState->GetCollectedGems())
+		{
+			for (size_t i = 0; i < this->Objects.size(); i++)
+			{
+				// Update the robot location
+				if (strncmp(this->Objects[i].Name.c_str(), &gem.Type, this->Objects[i].Name.length()) == 0)
+				{
+					this->Objects[i].Destroyed = true;
+				}
+			}
+		}
+
+		
+		// Update simulation status
+		if (nextCommand.Type == ArduinoCar_Core::Command::Type::Finished)
+		{
+			this->mIsComplete = true;
+		}
 	}
 }
 

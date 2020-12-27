@@ -155,27 +155,14 @@ void State::UpdateAccordingTo(const Command& action, bool noiseFlag)
 	if (action.Type == Command::Type::Move)
 	{
 		this->_attemptMove(action.Bearing, action.Distance, noiseFlag);
-
-		//double steering = atof(action[1].c_str());
-		//double distance = atof(action[2].c_str());
-
-		//this->_attemptMove(steering, distance, noiseFlag);
 	}
 	else if (action.Type == Command::Type::Extract)
 	{
 		this->_attemptExtraction(action.Gem, -1, -1);
-
-		//char gemType = action[1][0];
-		//if (action.size() == 4)
-		//{
-		//	double currentX = atof(action[2].c_str());
-		//	double currentY = atof(action[3].c_str());
-		//	this->_attemptExtraction(gemType, currentX, currentY);
-		//}
-		/*else
-		{
-			this->_attemptExtraction(gemType);
-		}*/
+	}
+	else if (action.Type == Command::Type::Finished)
+	{
+		std::cout << "Finished all extraction" << std::endl;
 	}
 	else
 	{
@@ -226,11 +213,10 @@ void ArduinoCar_Core::State::_attemptExtraction(char gemType, double currentX, d
 			double distance = sqrt(pow(this->mRobot.GetX() - gem.X, 2.0) + pow(this->mRobot.GetY() - gem.Y, 2.0));
 			if (distance < this->EXTRACTION_DISTANCE)
 			{
-				// TODO - Arnold: Convert all these members to a list for easy comparisons and removals?
 				this->mCollectedGems.push_back(gem);
-				this->mGemLocsOnMap.remove(gem);
 				this->mGemChecklist.remove(gem.Type);
 				this->mReportedGemLocations[gem.Type] = Point2D(currentX, currentY);
+				this->mGemLocsOnMap.remove(gem);
 				return;
 			}
 		}

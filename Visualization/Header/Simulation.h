@@ -86,6 +86,7 @@ namespace ArduinoCar_Visualization
 		unsigned int mActualTime = 0;	// The actual time(ms)
 		unsigned int mTimeStep = 1000;	// The 'physics' update period (ms)
 		unsigned int mRobotNdx = 0;		// Index of the robot in the simulation objects
+		bool mIsComplete = false;		// Flag indicating whether simulation has completed
 	};
 }
 

@@ -84,6 +84,11 @@ namespace ArduinoCar_Core
 		 */
 		const std::list<Gem> GetGemMapLocs() const { return mGemLocsOnMap; }
 
+		/**
+		 * Gets the list of collected gems
+		 */
+		const std::list<Gem> GetCollectedGems() const { return mCollectedGems; }
+
 
 	private:
 		std::list<char> mOriginalGemChecklist;			// List of gem types to be picked up
