@@ -1,7 +1,7 @@
 // ArduinoCar.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include "Header/Robot.h"
+//#include "Header/Robot.h"
 #include "Header/Matrix.h"
 
 #include <iostream>
@@ -12,17 +12,18 @@ using namespace ArduinoCar_Core;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    //std::cout << "Hello World!\n";
 
-    Matrix mat;
-    mat.Zero(3, 3);
+    //Matrix mat;
+    //mat.Zero(3, 3);
 
-    double val = mat(1, 1);
-    mat(1, 1, 3.2);
-    double newVal = mat(1, 1);
+    //double val = mat(1, 1);
+    //mat(1, 1, 3.2);
+    //double newVal = mat(1, 1);
 
 
-    mat.Show();
+    //mat.Show();
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

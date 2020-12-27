@@ -114,7 +114,7 @@ ArduinoCar_Core::Point2D ArduinoCar_Core::Robot::FindNextPoint(double steering, 
 }
 
 
-std::ostream& ArduinoCar_Core::operator<<(std::ostream& strm, const Robot& r)
+std::ostream& operator<<(std::ostream& strm, const ArduinoCar_Core::Robot& r)
 {
-	return strm << "Robot --- X: " << r.mX << " Y: " << r.mY << endl;
+	return strm << "Robot --- X: " << r.GetX() << "Robot --- Y: " << r.GetY() << endl;
 }

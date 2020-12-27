@@ -91,10 +91,6 @@ namespace ArduinoCar_Core
 		 */
 		friend std::ostream& operator<<(std::ostream& strm, const Robot& r);
 	};
-
-
-	
 }
-
 
 #endif
