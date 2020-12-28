@@ -146,7 +146,7 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 			{
 				double posX = this->mState->GetRobot().GetX();
 				double posY = this->mState->GetRobot().GetY();
-				this->Objects[i].Position = glm::vec2(posX, posY);
+				this->Objects[i].Position = glm::vec2(posX, -posY);
 			}
 		}
 
@@ -162,12 +162,6 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 
 
 		// Update object statuses
-		std::map<unsigned int, ArduinoCar_Core::GemMeasurement>::iterator it;
-		for (it = measurementMap.begin(); it != measurementMap.end(); it++)
-		{
-
-		}
-
 		for (const ArduinoCar_Core::Gem& gem : this->mState->GetCollectedGems())
 		{
 			for (size_t i = 0; i < this->Objects.size(); i++)
