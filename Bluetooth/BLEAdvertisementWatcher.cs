@@ -36,6 +36,16 @@ namespace ArduinoCar.Bluetooth
         /// </summary>
         public event Action<BLEDevice> NewDeviceDiscovered = (device) => { };
 
+        /// <summary>
+        /// Fired when a device name changes
+        /// </summary>
+        public event Action<BLEDevice> DeviceNameChanged = (device) => { };
+
+        /// <summary>
+        /// Fires when a device times out
+        /// </summary>
+        public event Action<BLEDevice> DeviceTimeout = (device) => { };
+
 
 
         /// <summary>
@@ -50,6 +60,9 @@ namespace ArduinoCar.Bluetooth
         {
             get
             {
+                // Clean up any timeouts
+                CleanupTimeouts();
+
                 // Lock because if list changes at point of querying it will crash
                 lock (_threadLock)
                 {
@@ -58,6 +71,12 @@ namespace ArduinoCar.Bluetooth
                 }
             }
         }
+
+        /// <summary>
+        /// The timeout in seconds that a device is removed from the <see cref="DiscoveredDevices"/>
+        /// list if it is not re-advertise within this time.
+        /// </summary>
+        public int HeartbeatTimeout { get; set; } = 30;
 
 
 
@@ -73,8 +92,9 @@ namespace ArduinoCar.Bluetooth
                 ScanningMode = BluetoothLEScanningMode.Active
             };
 
-            // Listen out for new advertisements
-            _watcher.Received += (watcher, e) =>
+            _watcher.Received += WatcherAdvertisementReceived;
+
+            _watcher.Stopped += (watcher, e) =>
             {
                 StoppedListening();
             };
@@ -87,9 +107,13 @@ namespace ArduinoCar.Bluetooth
         /// </summary>
         public void StartListening()
         {
-            if (Listening) { return; }
+            lock (_threadLock)
+            {
+                if (Listening) { return; }
 
-            _watcher.Start();
+                _watcher.Start();
+            }
+
             StartedListening();
         }
 
@@ -98,9 +122,13 @@ namespace ArduinoCar.Bluetooth
         /// </summary>
         public void StopListening()
         {
-            if (!Listening) { return; }
+            lock (_threadLock)
+            {
+                if (!Listening) { return; }
 
-            _watcher.Stop();
+                _watcher.Stop();
+                _discoveredDevices.Clear();
+            }
         }
 
 
@@ -112,14 +140,27 @@ namespace ArduinoCar.Bluetooth
         /// <param name="args">The arguments</param>
         private void WatcherAdvertisementReceived(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
+            // Cleanup the timeouts
+            CleanupTimeouts();
+
             BLEDevice device = null;
 
             // Is new discover?
             bool newDiscovery = !_discoveredDevices.ContainsKey(args.BluetoothAddress);
 
+            // Name Changed?
+            bool nameChanged = !newDiscovery && !string.IsNullOrEmpty(args.Advertisement.LocalName) 
+                && _discoveredDevices[args.BluetoothAddress].Name != args.Advertisement.LocalName;
+
             lock (_threadLock)
             {
                 string name = args.Advertisement.LocalName;
+
+                // If not a new discovery and name is blank don't bother setting it
+                if (string.IsNullOrEmpty(name) && !newDiscovery)
+                {
+                    name = _discoveredDevices[args.BluetoothAddress].Name;
+                }
 
                 // Creat new device info class
                 device = new BLEDevice
@@ -137,12 +178,41 @@ namespace ArduinoCar.Bluetooth
             // Device discovered event
             DeviceDiscovered(device);
 
+            // If device name changed
+            if (nameChanged)
+            {
+                DeviceNameChanged(device);
+            }
+
             // If new discover...
             if (newDiscovery)
             {
                 // If listening thread sleeps, this code wont continue so maybe fire in
                 // in task.
                 NewDeviceDiscovered(device);
+            }
+        }
+
+        /// <summary>
+        /// Prune any timed out devices that we have not heard from
+        /// </summary>
+
+        private void CleanupTimeouts()
+        {
+            lock (_threadLock)
+            {
+                // The oldest allowed date time threshold, now minus heartbeat timeout
+                DateTime threshold = DateTime.Now - TimeSpan.FromSeconds(HeartbeatTimeout);
+
+                // Any devices that have not sent a new broadcast within the heartbeat time
+                _discoveredDevices.Where(d => d.Value.BroadcastTime < threshold).ToList().ForEach(device =>
+                {
+                    // Remove device
+                    _discoveredDevices.Remove(device.Key);
+
+                    // Inform listeners
+                    DeviceTimeout(device.Value);
+                });
             }
         }
     }
