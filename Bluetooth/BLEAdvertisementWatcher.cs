@@ -196,7 +196,6 @@ namespace ArduinoCar.Bluetooth
         /// <summary>
         /// Prune any timed out devices that we have not heard from
         /// </summary>
-
         private void CleanupTimeouts()
         {
             lock (_threadLock)
