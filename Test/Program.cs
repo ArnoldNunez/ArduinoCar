@@ -6,11 +6,11 @@ namespace Test
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             Console.WriteLine("Hello World!");
 
-            BLEAdvertisementWatcher watcher = new BLEAdvertisementWatcher();
+            BLEAdvertisementWatcher watcher = new BLEAdvertisementWatcher(new GattServiceIds());
 
             watcher.StartedListening += () =>
             {
