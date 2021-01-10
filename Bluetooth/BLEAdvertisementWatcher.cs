@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace ArduinoCar.Bluetooth
 {
@@ -10,10 +13,11 @@ namespace ArduinoCar.Bluetooth
     /// </summary>
     public class BLEAdvertisementWatcher
     {
-        private object _threadLock = new object();
+        private readonly object _threadLock = new object();
         private readonly BluetoothLEAdvertisementWatcher _watcher;
-        private readonly Dictionary<ulong, BLEDevice> _discoveredDevices;
-
+        private readonly Dictionary<string, BLEDevice> _discoveredDevices;
+        private readonly GattServiceIds _gattServiceIds;
+        
 
 
         /// <summary>
@@ -36,6 +40,16 @@ namespace ArduinoCar.Bluetooth
         /// </summary>
         public event Action<BLEDevice> NewDeviceDiscovered = (device) => { };
 
+        /// <summary>
+        /// Fired when a device name changes
+        /// </summary>
+        public event Action<BLEDevice> DeviceNameChanged = (device) => { };
+
+        /// <summary>
+        /// Fires when a device times out
+        /// </summary>
+        public event Action<BLEDevice> DeviceTimeout = (device) => { };
+
 
 
         /// <summary>
@@ -50,6 +64,9 @@ namespace ArduinoCar.Bluetooth
         {
             get
             {
+                // Clean up any timeouts
+                CleanupTimeouts();
+
                 // Lock because if list changes at point of querying it will crash
                 lock (_threadLock)
                 {
@@ -59,22 +76,31 @@ namespace ArduinoCar.Bluetooth
             }
         }
 
+        /// <summary>
+        /// The timeout in seconds that a device is removed from the <see cref="DiscoveredDevices"/>
+        /// list if it is not re-advertise within this time.
+        /// </summary>
+        public int HeartbeatTimeout { get; set; } = 30;
+
 
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public BLEAdvertisementWatcher()
+        public BLEAdvertisementWatcher(GattServiceIds gattIds)
         {
-            _discoveredDevices = new Dictionary<ulong, BLEDevice>();
+            _gattServiceIds = gattIds ?? throw new ArgumentNullException(nameof(gattIds));
+
+            _discoveredDevices = new Dictionary<string, BLEDevice>();
 
             _watcher = new BluetoothLEAdvertisementWatcher
             {
                 ScanningMode = BluetoothLEScanningMode.Active
             };
 
-            // Listen out for new advertisements
-            _watcher.Received += (watcher, e) =>
+            _watcher.Received += WatcherAdvertisementReceivedAsync;
+
+            _watcher.Stopped += (watcher, e) =>
             {
                 StoppedListening();
             };
@@ -87,9 +113,13 @@ namespace ArduinoCar.Bluetooth
         /// </summary>
         public void StartListening()
         {
-            if (Listening) { return; }
+            lock (_threadLock)
+            {
+                if (Listening) { return; }
 
-            _watcher.Start();
+                _watcher.Start();
+            }
+
             StartedListening();
         }
 
@@ -98,9 +128,13 @@ namespace ArduinoCar.Bluetooth
         /// </summary>
         public void StopListening()
         {
-            if (!Listening) { return; }
+            lock (_threadLock)
+            {
+                if (!Listening) { return; }
 
-            _watcher.Stop();
+                _watcher.Stop();
+                _discoveredDevices.Clear();
+            }
         }
 
 
@@ -110,32 +144,51 @@ namespace ArduinoCar.Bluetooth
         /// </summary>
         /// <param name="sender">The watcher</param>
         /// <param name="args">The arguments</param>
-        private void WatcherAdvertisementReceived(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
+        private async void WatcherAdvertisementReceivedAsync(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
-            BLEDevice device = null;
+            // Cleanup the timeouts
+            CleanupTimeouts();
 
-            // Is new discover?
-            bool newDiscovery = !_discoveredDevices.ContainsKey(args.BluetoothAddress);
+            // Get BLE device info
+            BLEDevice device = await GetBluetoothLEDeviceAsync(args.BluetoothAddress, args.Timestamp, args.RawSignalStrengthInDBm);
+
+            if (device == null) { return; }
+
+            // Check if this a new discovery
+            bool newDiscovery = false;
+            string existingName = default;
+            bool nameChanged = default;
 
             lock (_threadLock)
             {
-                string name = args.Advertisement.LocalName;
+                newDiscovery = !_discoveredDevices.ContainsKey(device.DeviceId);
 
-                // Creat new device info class
-                device = new BLEDevice
-                (
-                    address: args.BluetoothAddress,
-                    name: name,
-                    broadcastTime: args.Timestamp,
-                    rssi: args.RawSignalStrengthInDBm
-                );
+                if (!newDiscovery)
+                {
+                    existingName = _discoveredDevices[device.DeviceId].Name;
+                }
+
+                // Check if name has changed
+                nameChanged = !newDiscovery &&
+                    !string.IsNullOrEmpty(device.Name) &&
+                    existingName != device.Name;
+
+                // Check for listening status due to threading
+                if (!Listening)
+                    return;
 
                 // Add/update the device in dictionary
-                _discoveredDevices[args.BluetoothAddress] = device;
+                _discoveredDevices[device.DeviceId] = device;
             }
 
             // Device discovered event
             DeviceDiscovered(device);
+
+            // If device name changed
+            if (nameChanged)
+            {
+                DeviceNameChanged(device);
+            }
 
             // If new discover...
             if (newDiscovery)
@@ -143,6 +196,71 @@ namespace ArduinoCar.Bluetooth
                 // If listening thread sleeps, this code wont continue so maybe fire in
                 // in task.
                 NewDeviceDiscovered(device);
+            }
+        }
+
+        /// <summary>
+        /// Connects to the BLE device and extracts more information from the bluetooth device
+        /// </summary>
+        /// <param name="address">The bluetooth address of the device to connect to</param>
+        /// <param name="broadcastTime">The time the broadcast message was received</param>
+        /// <param name="rssi">The signal strength in db</param>
+        /// <returns></returns>
+        private async Task<BLEDevice> GetBluetoothLEDeviceAsync(ulong address, DateTimeOffset broadcastTime, short rssi)
+        {
+            // Get bluetooth device info
+            using BluetoothLEDevice device = await BluetoothLEDevice.FromBluetoothAddressAsync(address);
+
+            if (device == null) { return null; }
+
+
+            GattDeviceServicesResult gatt = await device.GetGattServicesAsync();
+
+            if (gatt.Status == GattCommunicationStatus.Success)
+            {
+                // Loop each gatt service
+                foreach (GattDeviceService service in gatt.Services)
+                {
+                    // This id contains the gatt profile assigned number we want
+                    // TODO: Get more info and connect.
+                    Guid gattProfileId = service.Uuid;
+                }
+            }
+
+
+            // Return the new device information
+            return new BLEDevice
+            (
+                deviceId: device.DeviceId,
+                name: device.Name,
+                address: device.BluetoothAddress,
+                rssi: rssi,
+                broadcastTime: broadcastTime,
+                connected: device.ConnectionStatus == BluetoothConnectionStatus.Connected,
+                canPair: device.DeviceInformation.Pairing.CanPair,
+                paired: device.DeviceInformation.Pairing.IsPaired
+            );
+        }
+
+        /// <summary>
+        /// Prune any timed out devices that we have not heard from
+        /// </summary>
+        private void CleanupTimeouts()
+        {
+            lock (_threadLock)
+            {
+                // The oldest allowed date time threshold, now minus heartbeat timeout
+                DateTime threshold = DateTime.Now - TimeSpan.FromSeconds(HeartbeatTimeout);
+
+                // Any devices that have not sent a new broadcast within the heartbeat time
+                _discoveredDevices.Where(d => d.Value.BroadcastTime < threshold).ToList().ForEach(device =>
+                {
+                    // Remove device
+                    _discoveredDevices.Remove(device.Key);
+
+                    // Inform listeners
+                    DeviceTimeout(device.Value);
+                });
             }
         }
     }
