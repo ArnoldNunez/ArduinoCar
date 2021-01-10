@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
 
     // Create the window
-    GLFWwindow* window = glfwCreateWindow(1280, 960, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 960, "Arduino Car Visualization", NULL, NULL);
     if (window == NULL) 
     {
         std::cout << "Failed to create GLFW window" << std::endl;
