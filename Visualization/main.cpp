@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
         engine.Update(deltaTime * 1000.0);
 
         // Render
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         engine.Render();
 

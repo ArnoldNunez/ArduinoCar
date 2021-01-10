@@ -73,6 +73,7 @@ namespace ArduinoCar_Core
 
 		double GetX() const { return this->mX; }
 		double GetY() const { return this->mY; }
+		double GetBearing() const { return this->mBearing; }
 
 	private:
 		double mX;

@@ -146,7 +146,10 @@ void ArduinoCar_Visualization::Simulation::Update(float dt)
 			{
 				double posX = this->mState->GetRobot().GetX();
 				double posY = this->mState->GetRobot().GetY();
+				double heading = this->mState->GetRobot().GetBearing();
+
 				this->Objects[i].Position = glm::vec2(posX, -posY);
+				this->Objects[i].Rotation = -glm::degrees(heading);
 			}
 		}
 
@@ -224,7 +227,7 @@ void ArduinoCar_Visualization::Simulation::GenerateMap(const std::string& mapStr
 
 			SimulationObject gem(loc, size, mResourceManager.GetTexture("gem"));
 			gem.Name = mapString[i];
-			gem.Color = color;
+			//gem.Color = color;
 			this->Objects.push_back(gem);
 
 			posX += Simulation::MAP_HORIZ_SPACING;

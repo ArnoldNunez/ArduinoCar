@@ -34,25 +34,25 @@ void Engine::Init()
 
 	// Load textures
 	this->mResourceManager.LoadTexture("Textures/awesomeface.png", true, "face");
-	this->mResourceManager.LoadTexture("Textures/Health.png", true, "gem");
+	this->mResourceManager.LoadTexture("Textures/gem_blue.png", true, "gem");
 	this->mResourceManager.LoadTexture("Textures/Health.png", true, "gem_empty");
-	//this->mResourceManager.LoadTexture("Textures/red_dot_better.png", false, "red_dot");
-	//this->mResourceManager.LoadTexture("Textures/red_dot_dark.png", false, "red_dot_dark");
-	this->mResourceManager.LoadTexture("Textures/Health.png", true, "turtle");
+	this->mResourceManager.LoadTexture("Textures/car.png", true, "turtle");
+	this->mResourceManager.LoadTexture("Textures/background.png", true, "background");
+
 
 	// Create Tests
 	Simulation simulation1(this->mResourceManager);
 	simulation1.FromFile("Simulation1.sim");
-
+	
 	Simulation simulation2(this->mResourceManager);
 	simulation2.FromFile("Simulation2.sim");
 
-	//Simulation simulation3(this->mResourceManager);
-	//simulation2.FromFile("Simulation3.sim");
+	Simulation simulation3(this->mResourceManager);
+	simulation3.FromFile("Simulation4.sim");
 
-	this->Tests.push_back(simulation1);
-	this->Tests.push_back(simulation2);
-	//this->Tests.push_back(simulation3);
+	//this->Tests.push_back(simulation1);
+	//this->Tests.push_back(simulation2);
+	this->Tests.push_back(simulation3);
 	this->Test = 0;
 }
 
@@ -85,5 +85,6 @@ void Engine::Render()
 	Texture2D turtleTex = this->mResourceManager.GetTexture("turtle");
 	this->mRenderer->DrawSprite(turtleTex, glm::vec2(0.0f, 0.0f), glm::vec2(150.0f, 150.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));*/
 
+	// Render the test scenario
 	this->Tests[this->Test].Draw(*mRenderer);
 }
